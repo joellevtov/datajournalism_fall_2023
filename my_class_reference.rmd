@@ -1,0 +1,149 @@
+---
+title: "Class Reference"
+author: "Derek Willis"
+output:
+  html_document:
+    theme: cerulean
+    highlight: pygments
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+print("Hello puppy!")
+```
+
+## Introduction
+
+Consider this a personal guide to the commands and functions you will learn. In general, when you come across an R command or function that you want to remember, put it in here along with a description of what it does and when you'd use it.
+
+### Find repository
+
+On Github, Repository -\> View in Finder
+
+### How to set the working directory
+
+The command to set a working directory is setwd(). For example:
+
+```{r}
+setwd("~/code/data_journalism_2023_spring")
+```
+
+Or, open the folder you're working from in the R directory on the right (or click on the three dots to use the Finder app) - that's your working directory - and click the settings wheel and hit "Set as working directory."
+
+### First, install and load the tidyverse
+
+```{r}
+install.packages("tidyverse")
+library(tidyverse)
+```
+
+```{r}
+library(tidyverse)
+```
+
+### How to read in a CSV file from the Internet
+
+```{r}
+wes_moore_contributions <- read_csv("https://raw.githubusercontent.com/stephenneukam/CNS_Annapolis/main/Campaign_finance/Moore_ContributionsList.csv")
+```
+
+You use the `n()` function to count rows, like so:
+
+```{r}
+umd_courses |> 
+  group_by(title) |> 
+  summarize(count = n())
+```
+
+Use variables, and how to make new datasets
+
+If you don't want to type in 2 everytime you use it, you can set it equal to "number" - meaning that whenever you type "number" it'll know that you mean 2.
+
+```{r}
+number <- 2
+```
+
+### Open certain data
+
+Note: The function is stupid and refuses to look into subfolders. So tell it to look in the folder where the file is, not anywhere else.
+
+```{r}
+what_you_want_the_thing_youre_saying_to_be_called' <- read_csv/rds/etc("file_name")
+```
+
+```{r}
+umd_courses <- read_rds("umd_courses.rds")
+```
+
+### The pipe operator
+
+"Do this thing next"
+
+CMD + P
+
+```{r}
+|> 
+```
+
+#### Sorting
+
+Think of a deck of cards, if you're told to group them by group, you'd seperate by hearts, clubs, aces, jacks, etc. **Same thing in R.**
+
+```{r}
+group_by()
+```
+
+### Useful Functions
+
+Get a list of all the columns with mean, median, and quartiles
+
+```{r}
+summary(%)
+```
+
+Get a quick list of all the columns
+
+```{r}
+col_names (%)
+```
+
+Filter data using the filter() function. BUT make sure to do ==, otherwise it'll turn all the columns into, in this case, journalism.
+
+```{r}
+filter(department=="Journalism")
+```
+
+Count the number of rows
+
+```{r}
+  summarize(count = n())
+```
+
+### Boolean Operators
+
+-   Is exactly: ==
+
+-   Is not: !=
+
+-   Contains: str_detect("keyword")
+
+-   Is greater than: \>
+
+-   Is less than: \<
+
+-   Is greater than or equal to: \>=
+
+-   Everything except this: -variable
+
+-   And: (&) (,)
+
+-   Or: \|
+
+-   Begins with: \^
