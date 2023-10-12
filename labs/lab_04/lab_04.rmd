@@ -48,12 +48,20 @@ maryland_expenses <- read_csv("data/maryland_expenses.csv")
 maryland_expenses
 
 cleaned_maryland_expenses <- maryland_expenses %>% 
-  clean_names()  
+  clean_names()
+  
 
 cleaned_maryland_expenses 
 
+## new column to see if this works
+add_column (
+  .cleaned_maryland_expenses
+)
+
+
+
 cleaned_maryland_expenses <- cleaned_maryland_expenses %>% 
-  mutate(expenditure_date=mdy(expenditure_date))
+  mutate(date_of_expenditure=mdy(date_of_expenditure))
 
 cleaned_maryland_expenses
 

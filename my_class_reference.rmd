@@ -54,7 +54,7 @@ library(tidyverse)
 wes_moore_contributions <- read_csv("https://raw.githubusercontent.com/stephenneukam/CNS_Annapolis/main/Campaign_finance/Moore_ContributionsList.csv")
 ```
 
-You use the `n()` function to count rows, like so:
+You use the `n()` function to count rows and get an overview of the data, like so:
 
 ```{r}
 umd_courses |> 
@@ -126,6 +126,14 @@ Count the number of rows
   summarize(count = n())
 ```
 
+Change a column's name
+
+```{r}
+colnames(your_file_or_variable_name) <- c("what_you_want_it_to_say_instead")
+```
+
+In this example, the first column's name is changed to "what_you_want_it_to_say_instead"
+
 ### Boolean Operators
 
 -   Is exactly: ==
@@ -147,3 +155,52 @@ Count the number of rows
 -   Or: \|
 
 -   Begins with: \^
+
+If you want to look up two things in one filter
+
+```{r}
+earthquakes |> 
+   filter(str_detect(place, "alaska") | str_detect(place, "Alaska"))
+```
+
+To find the mean
+
+```{r}
+earthquakes |> 
+  filter(str_detect(type, "earthquake")) |> 
+  summarize(mean_depth = mean(depth))
+```
+
+Lubridate (in tidyverse) syntax
+
+```{r}
+what_you_want_the_column_to_called=lubridate_function(existing_column)
+```
+
+Make a new column based on whether something is a certain thing
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(janitor)
+
+earthquakes <- read_csv('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv')
+
+earthquakes |> 
+  mutate(
+    ##what you want the column to be called 
+    state 
+    = case_when(
+        mag>3 ~ "serious",
+        .default = "not serious"
+      )
+    ## makes a NEW column with whether it's serious or not
+  )
+```
+
+Pick only certain columns
+
+```{r}
+earthquakes |> 
+  select(mag)
+```
