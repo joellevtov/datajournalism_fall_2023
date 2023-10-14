@@ -102,6 +102,14 @@ group_by()
 
 ### Useful Functions
 
+Get a list of unique values in your dataset
+
+```{r}
+dataset_name |> 
+  group_by(column_you_want_to_see_an_overview_of) |> 
+  summarize(count = n())
+```
+
 Get a list of all the columns with mean, median, and quartiles
 
 ```{r}
@@ -118,6 +126,12 @@ Filter data using the filter() function. BUT make sure to do ==, otherwise it'll
 
 ```{r}
 filter(department=="Journalism")
+```
+
+R loves to be a pain in the ass and show you only case-matched results. Here's how to tell it to look for it in every case:
+
+```{r}
+filter(str_detect(gender, "(?i)F"))
 ```
 
 Count the number of rows
@@ -203,4 +217,17 @@ Pick only certain columns
 ```{r}
 earthquakes |> 
   select(mag)
+```
+
+Remove something from your library/environment
+
+```{r}
+rm(get_rid_of_this)
+```
+
+Check if there are any non-dates in a column after you've loaded the lubridate library using the women_shot_in_2020 dataframe with dates in a ymd arrangement (quiet=TRUE just tells R to shut the hell up about its stupid warnings):
+
+```{r}
+testing_shot_women <- women_shot_in_2020 %>%
+  filter(!is.Date(ymd(date, quiet = TRUE)))
 ```

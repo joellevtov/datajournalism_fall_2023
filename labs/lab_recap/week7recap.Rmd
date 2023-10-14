@@ -219,9 +219,7 @@ only_serious_earthquakes <- serious_earthquakes |>
   filter(str_detect(state !="not")) 
 ```
 
-When you run that, you'll see that it returns an error saying: ""Error in filter(serious_earthquakes, str_detect(state != "not")) :
-Caused by error in \`str_detect()\`:
-! argument "pattern" is missing, with no default"
+When you run that, you'll see that it returns an error saying: ""Error in filter(serious_earthquakes, str_detect(state !="not")) : Caused by error in \`str_detect()\`: ! argument "pattern" is missing, with no default"
 
 This might as well have been written in Chinese. I asked my friend ChatGPT what the hell was wrong with my code and it, helpfully told me that my code was wrong and corrected the place of the exclamation mark so the code looked like this:
 
