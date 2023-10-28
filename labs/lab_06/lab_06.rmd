@@ -1,6 +1,6 @@
 ---
 title: "lab_06"
-author: "derek willis"
+author: "joel lev-tov"
 date: "2023-10-20"
 output: html_document
 ---
@@ -19,6 +19,7 @@ options(scipen=999)
 library(tidyverse)
 library(lubridate)
 library(janitor)
+library(dplyr)
 ```
 
 ## Getting Started
@@ -32,29 +33,51 @@ This week we'll be combining and joining data to make it more useful and to ask 
 allegany_911 <- read_csv("data/allegany_911.csv")
 baltimore_911 <- read_csv("data/baltimore_911.csv")
 carroll_911 <- read_csv("data/carroll_911.csv")
+cecil_911 <- read_csv("data/cecil_911.csv")
 maryland_zip_code_data <- read_csv("data/maryland_zcta.csv")
 
 clean_names(allegany_911)
 clean_names(baltimore_911)
 clean_names(carroll_911)
+clean_names(cecil_911)
 clean_names(maryland_zip_code_data)
 
-allegany_911 <- mutate(allegany_911, Date = toupper(date))
+allegany_911 <- rename(allegany_911, Date = date)
+allegany_911 <- rename(allegany_911, Location = location)
+
+cecil_911 <- rename(cecil_911, Date = date)
+cecil_911 <- rename(cecil_911, Location= location)
+
+glimpse(allegany_911)
+glimpse(baltimore_911)
+glimpse(carroll_911)
+
+three_counties_md_911 <- bind_rows(list(allegany_911, carroll_911, cecil_911))
+## upon joining, i should still have 3 columns. and i do! i can't believe r is petty enough to make me rename columns to have not only the same name but the same CAPITALIZATION. actually, yes i can.
 ```
 
 Then we'll join some demographic data with Baltimore City 911 calls and ask some questions of that. For that, you'll need to load the Baltimore City 911 data and the ZCTA demographic data from the data folder, and join them based on the zip code. Remember, the zip codes in both dataframes must be the same datatype (and should be characters). You should start with your Baltimore City 911 dataframe in creating your join.
 
+Can I just say, this question was a hell of a headache. I was using Bard and it was introducing me to the cross_join function; that wrecked my brain for about three quarters of an hour. I *think* I finally get it now, my error was thinking there were no common columns at all - after all, what the hell does ZCTA5N mean? But I finally realized that that weird jumble of numbers and letters is the same as the zip_code column.
+
 ```{r}
 # load and join the Baltimore-related data
+baltimore_911_demographics <-
+  baltimore_911 |> 
+  full_join(maryland_zip_code_data, join_by(zip_code == ZCTA5N))
 ```
 
 ## Answer questions
 
 Q1. Let's start with our data from Allegany, Cecil and Carroll counties. Write code to generate a dataframe that shows the total number of calls for each county. What's the order of counties from most calls to least?
 
-A1.
+A1. Carroll, then Cecil, then Allegany.
 
 ```{r}
+three_counties_md_911 |> 
+  group_by(county) |>
+  summarise(count = n()) |> 
+  arrange(desc(count))
 ```
 
 Q2. In your combined dataframe that you used in A1, add a column for the month of each call, then write code to show the total number of calls per county and month. Are there any outliers or noteworthy results? Describe the general pattern of the results.
@@ -64,11 +87,19 @@ Then calculate the most calls per county and location. Which location had the mo
 A2.
 
 ```{r}
+## adding a column for the month of the call
+three_counties_md_911 <- three_counties_md_911 |> 
+  mutate(date=ymd(date))
+  
+glimpse(three_counties_md_911)
+
+three_counties_md_911 |> 
+  mutate(month = month(Date, , label = TRUE, abbr = FALSE))
 ```
 
 Q3. Let's turn to the Baltimore City data. You're interested in exploring calls in zip codes with a high percentage of children under 18. Write code to isolate calls in zip codes where the percentage of under 18 population is at least 75% and then show the zip code and population and how many calls occurred in each of those zip codes.
 
-Where are those zip codes in the city?
+Where are those zip codes in the city? **See below in the first code block.**
 
 Add a column to your code that calculates the number of calls per 1,000 people for those zip codes. To calculate a per capita rate, you might find this short guide handy: [https://observablehq.com/\@palewire/per-capita-calculator](https://observablehq.com/@palewire/per-capita-calculator){.uri}.
 
@@ -77,6 +108,15 @@ Which zip code has the highest rate of calls per 1,000 people? Find the neighbor
 A3.
 
 ```{r}
+calls_per_zip_u18_baltimore <- baltimore_911_demographics |> 
+  filter(PCT_UNDER_18 > 74.9) |> 
+  group_by(zip_code, POPULATION) |> 
+  summarise(num_calls = n()) 
+
+glimpse(calls_per_zip_u18_baltimore )
+
+calls_per_zip_u18_baltimore |> 
+  mutate(per_capita_calls = (num_calls/POPULATION) * 10000) 
 ```
 
 Q4. Choose your own adventure: I want you to come up with a question you could ask of the Baltimore City data that combines both the calls and the demographic information. You must use both demographics and the overdose call data in your work.
@@ -84,4 +124,88 @@ Q4. Choose your own adventure: I want you to come up with a question you could a
 A4:
 
 ```{r}
+## Well, I read the question wrong so for shits and giggles, here's the answer to: Which month was the busiest in each county?
+carroll_month <- carroll_911 |> 
+  mutate(month = month(Date, label= TRUE, abbr = FALSE)) |> 
+  group_by(month, county) |> 
+  summarize(count = n()) |> 
+  arrange(desc(count)) |> 
+  head(1)
+
+cecil_month <- cecil_911 |> 
+  mutate(month = month(Date, label= TRUE, abbr = FALSE)) |> 
+  group_by(month, county) |> 
+  summarize(count = n()) |> 
+  arrange(desc(count)) |> 
+  head(1)
+
+allegany_month <- allegany_911 |> 
+  mutate(month = month(Date, label= TRUE, abbr = FALSE)) |> 
+  group_by(month, county) |> 
+  summarize(count = n()) |> 
+  arrange(desc(count)) |> 
+  head(1)
+
+baltimore_month <- baltimore_911 |> 
+  mutate(month = month(date, label= TRUE, abbr = FALSE)) |> 
+  mutate(county = "Baltimore") |> 
+  group_by(month, county) |> 
+  summarize(count = n()) |> 
+  arrange(desc(count)) |> 
+  head(1)
+
+## I've put it all into one data frame for convenience.
+
+four_counties_busiest_month <-
+  allegany_month |> 
+  full_join(carroll_month) |> 
+  full_join(cecil_month) |> 
+  full_join(baltimore_month)
+```
+
+Now to the actual thing: Does a higher number of people of color in a neighborhood correlate to less (or more) calls to 911?
+
+```{r}
+baltimore_911_demographics |> 
+  ungroup()
+
+baltimore_neigbhorhoods <- baltimore_911_demographics |> 
+  group_by(neighborhood, PCT_WHITE_NON_HISPANIC, PCT_BLACK_NON_HISPANIC, PCT_NATIVE, PCT_ASIAN, PCT_HAWAIIAN, PCT_OTHER, PCT_HISPANIC) |> 
+  mutate(percent_people_of_color = (PCT_BLACK_NON_HISPANIC + PCT_NATIVE + PCT_ASIAN + PCT_HAWAIIAN + PCT_OTHER + PCT_HISPANIC)) 
+
+## here's my goal: display a list of neighborhoods with the average number of people of color in it (since i noticed a ton of duplicates thanks to different zip code demographics within one neighborhood). that way, i'd have in a cute list - one neighborhood, %white people, %poc. (i realize it's  a simplistic way of looking at diverse populations but I thought doing it this way would make it easier on myself. boy was I wrong.) and then, i was hoping to  gather the number of calls per county. here's what i imagine the table would roughly look like:
+## neighborhood name | number of calls to 911 | % white people | % poc
+## xyz               | xxxx                   | xx%            | xx%
+## if it wasn't obvious from my foreshadowing above, i had no clue what i was getting myself into. 
+
+# i tried a ton of things, starting with just simple code I got from chat gpt that displays duplicates. 
+baltimore_duplicates <- baltimore_neigbhorhoods |> 
+  group_by(neighborhood) |> 
+  summarize(count=n()) |> 
+  filter(count > 1) |> 
+  ungroup() 
+
+neighborhoods_num <- baltimore_neigbhorhoods |> 
+  group_by(neighborhood) |> 
+  summarize(count=n()) |> 
+  nrow()
+
+## so now we know that 237 out of 253 neighborhoods that appear more than once. count tells us how many times each neighborhood appears. now i'm going to do something i have about -10 clue how to do, hoping to use chat gpt to help me along the way. i want to group all the neighborhoods on that list into a nice list of all the neighborhoods.
+
+unique_neighborhoods <- baltimore_neigbhorhoods |> 
+  ungroup() |> 
+  select(neighborhood) %>%
+  distinct()
+
+neighborhoods_only <- anti_join(unique_neighborhoods, neighborhoods_only, by = "neighborhood")
+
+neighborhoods_only <- bind_rows(neighborhoods_only, unique_neighborhoods)
+
+## cute! and can i just say, i worship whoever came up with the anti_join() funtion name. i now have two gods, oscar the grouch and whoever came up with anti_join(). praise be!
+## and that's where i'm quitting. i'm going to come back to this with a clearer head and hopefully with you, derek. i now have about 1/4 of the info i want - see below.
+
+## neighborhood name (unique) | number of calls to 911 | % white people | % poc
+## i got this!                | xxxx                   | xx%            | xx%
+
+## "all" i need to do now is get an average of the % of people of color in each neighborhood in neighborhoods_only. then, i think i (should) be on my merry way. i had some code that did this earlier thanks to chat gpt but i deleted it because i had way too much junk code lying around and it was overwhelming me.
 ```

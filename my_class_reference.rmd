@@ -247,11 +247,13 @@ It gets more complicated when you have two similar, but not identically structur
 
 `left_join` - takes the table on the left and adds only matching data from the right table
 
-`right_join` - takes the table on the right and adds only matching data form the left table
+`right_join` - takes the table on the right and adds only matching data from the left table
 
 `inner_join` - returns only matches
 
-`full-join` - combine everything, regardless of if there are matches
+`full_join` - combine everything if you have matching columns
+
+`cross_join`
 
 ```{r}
 maryland_population |> 
@@ -263,6 +265,7 @@ This would add only data from the rows with the same label as `maryland_populati
 If there are two columns that show the same thing but don't have the same name, you can tell R what's equivalent in the `join_by` function.
 
 ```{r}
-maryland_population_with_voters_and_demographics <- maryland_population_with_voters |> 
+maryland_population_with_voters_and_demographics <- 
+  maryland_population_with_voters |> 
   left_join(maryland_demographics, join_by(COUNTY == NAME))
 ```
