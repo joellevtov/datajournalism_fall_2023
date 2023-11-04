@@ -149,6 +149,13 @@ colnames(your_file_or_variable_name) <- c("what_you_want_it_to_say_instead")
 
 In this example, the first column's name is changed to "what_you_want_it_to_say_instead"
 
+Easier:
+```{r}
+df <- df |> 
+  rename(new_name = old_name)
+```
+
+
 ### Boolean Operators
 
 -   Is exactly: ==

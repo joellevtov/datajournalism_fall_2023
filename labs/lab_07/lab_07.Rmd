@@ -1,0 +1,177 @@
+---
+title: "lab_07"
+author: "derek willis"
+date: "2023-03-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## You will need
+
+-   A Census API key
+
+## Load libraries and establish settings
+
+You'll need to load two packages for this: the tidyverse and tidycensus.
+
+**Task** load these two packages
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+library(tidyverse)
+library(tidycensus)
+# Load the tidyverse.
+```
+
+## Setup Census API
+
+You'll need your Census API Key:
+
+**Task** set your API Key if you haven't already. You won't need to install or overwrite it.
+
+```{r echo=FALSE}
+```
+
+## Load and view ACS variables
+
+You'll also need to load the list of American Community Survey variables from the 2021 5-year estimates so you can identify the codes you need:
+
+**Task** load the variables from the 2021 5-year ACS (which is called "acs5") and save them to a dataframe
+
+```{r}
+acs2021_5yr <- load_variables(2021, "acs5")
+View(acs2021_5yr)
+```
+
+## Answer questions
+
+**Q1** What is the Maryland jurisdiction with the lowest median age, according to the ACS 2021 5-year estimates? You will need to find the variable for median age first. **It's Baltimore City.**
+
+```{r}
+acs2021_5yr |> 
+  filter(str_detect(name, "B01002"))
+
+maryland <- get_acs(geography = "county",
+              variables = c(median_age = "B01002_001"),
+              state = "MD",
+              year = 2021) 
+
+maryland |> 
+  arrange(estimate)
+```
+
+**Q2** Which Maryland counties have a median age of at least 50? You can use the dataframe you just made to answer this, but you must write code to display only those counties with a median age of at least 50. **Worcester and Talbot.**
+
+```{r}
+maryland |> 
+  filter(estimate >= 50)
+```
+
+**Q3** We're interested in knowing more about Montgomery County zip codes where overdose calls are coming from and the demographic characteristics they possess. In particular, we want to calculate a rate of calls per 1,000 population. To do this, you'll need to:
+
+1.  Load the Montgomery County 911 overdose calls data.
+2.  Create a new dataframe with the total number of calls for each zip code.
+3.  Find the ACS variable pertaining to the total 18 and up population (there are several choices here; you want the simplest one).
+4.  Get from the ACS data from all Maryland zip codes using that variable.
+5.  Join the ACS data to the Montgomery County zip code totals dataframe and rename the estimate column to a meaningful name you've given the ACS variable.
+6.  Add a column to the joined dataframe that calculates a rate of calls per 1,000 population.
+
+Which zip code has the highest rate of calls? Which has the lowest?
+
+**Zip code 20877 had the highest, while zip code 20707 had the lowest.**
+
+```{r}
+moco_2022_overdoses <- read_csv("data/montgomery_2022_overdoses.csv")
+moco_2022_zipcalls <- moco_2022_overdoses |> 
+  group_by(zip) |> 
+  summarise(count = n()) 
+
+md_over_18 <- get_acs(geography="zcta", variables = "B09021_001", year=2019)
+
+moco_2022_zipcalls$zip <- as.character(moco_2022_zipcalls$zip)
+
+joined_moco_zip_pop <- md_over_18 |> 
+  inner_join(moco_2022_zipcalls, join_by(GEOID==zip))
+
+joined_moco_zip_pop <- joined_moco_zip_pop|> 
+  rename(num_calls = count) |> 
+  rename(num_people = estimate) |> 
+  rename(zip_code = GEOID)
+
+joined_moco_zip_pop <- joined_moco_zip_pop |> 
+  mutate(calls_per_thousand = (num_calls/num_people)*1000) |> 
+  arrange(desc(calls_per_thousand))
+```
+
+```{r}
+moco_over_18 <- get_acs(geography="zcta", variables = c("B01001_007", "B01001_008", "B01001_009", "B01001_010", "B01001_011", "B01001_012", "B01001_013", "B01001_014", "B01001_015", "B01001_016", "B01001_017", "B01001_018","B01001_019", "B01001_020", "B01001_021", "B01001_022", "B01001_023","B01001_024", "B01001_025", "B01001_031", "B01001_032", "B01001_033","B01001_034","B01001_035","B01001_036", "B01001_037","B01001_038", "B01001_039",  "B01001_040",  "B01001_041","B01001_042", "B01001_043", "B01001_044", "B01001_045", "B01001_046", "B01001_047", "B01001_048", "B01001_049"), state='MD', year=2019)
+
+
+moco_over_18[moco_over_18 == "B01001_007"] <- "Male 18&19"
+moco_over_18[moco_over_18 == "B01001_008"] <- "Male 20"
+moco_over_18[moco_over_18 == "B01001_009"] <- "Male 21"
+moco_over_18[moco_over_18 == "B01001_010"] <- "Male 22-24"
+moco_over_18[moco_over_18 == "B01001_011"] <- "Male 25-29"
+moco_over_18[moco_over_18 == "B01001_012"] <- "Male 30-34"
+moco_over_18[moco_over_18 == "B01001_013"] <- "Male 35-39"
+moco_over_18[moco_over_18 == "B01001_014"] <- "Male 40-44"
+moco_over_18[moco_over_18 == "B01001_015"] <- "Male 45-49"
+moco_over_18[moco_over_18 == "B01001_016"] <- "Male 50-54"
+moco_over_18[moco_over_18 == "B01001_017"] <- "Male 55-59"
+moco_over_18[moco_over_18 == "B01001_018"] <- "Male 60&61"
+moco_over_18[moco_over_18 == "B01001_019"] <- "Male 62-64"
+moco_over_18[moco_over_18 == "B01001_020"] <- "Male 65&66"
+moco_over_18[moco_over_18 == "B01001_021"] <- "Male 67-69"
+moco_over_18[moco_over_18 == "B01001_022"] <- "Male 70-74"
+moco_over_18[moco_over_18 == "B01001_023"] <- "Male 75-79"
+moco_over_18[moco_over_18 == "B01001_024"] <- "Male 80-84"
+moco_over_18[moco_over_18 == "B01001_025"] <- "Male over 85"
+moco_over_18[moco_over_18 == "B01001_031"] <- "Female 18&19"
+moco_over_18[moco_over_18 == "B01001_032"] <- "Female 20"
+moco_over_18[moco_over_18 == "B01001_033"] <- "Female 21"
+moco_over_18[moco_over_18 == "B01001_034"] <- "Female 22-24"
+moco_over_18[moco_over_18 == "B01001_035"] <- "Female 25-29"
+moco_over_18[moco_over_18 == "B01001_036"] <- "Female 30-34"
+moco_over_18[moco_over_18 == "B01001_037"] <- "Female 35-39"
+moco_over_18[moco_over_18 == "B01001_038"] <- "Female 40-44"
+moco_over_18[moco_over_18 == "B01001_039"] <- "Female 45-49"
+moco_over_18[moco_over_18 == "B01001_040"] <- "Female 50-54"
+moco_over_18[moco_over_18 == "B01001_041"] <- "Female 55-59"
+moco_over_18[moco_over_18 == "B01001_042"] <- "Female 60&61"
+moco_over_18[moco_over_18 == "B01001_043"] <- "Female 62-64"
+moco_over_18[moco_over_18 == "B01001_044"] <- "Female 65&66"
+moco_over_18[moco_over_18 == "B01001_045"] <- "Female 67-69"
+moco_over_18[moco_over_18 == "B01001_046"] <- "Female 70-74"
+moco_over_18[moco_over_18 == "B01001_047"] <- "Female 75-79"
+moco_over_18[moco_over_18 == "B01001_048"] <- "Female 80-84"
+moco_over_18[moco_over_18 == "B01001_049"] <- "Female over 85"
+
+
+# I'm fully aware that this was way more work that I needed to put in, but I want to display the fruits of my six hours of labor. So you will have to, in the nicest way possible, deal with it. I realized that what I was imagining to do with all the data, combining all the charts into one total of >18 year olds per zip code was way too much work. So I will unfortunately have to relent and do it the easy way.
+```
+
+**Q4** Using [CensusReporter.org](https://censusreporter.org/), examine the zip codes with the highest and lowest rates and compare and contrast their demographic profiles. Is there a story here?
+
+**Maybe. At first I was surprised that 20877, which has less native people, more white people, and I guess would be more affluent (though I haven't looked at the data, just comparing my knowlege of the two parts of MoCo) has many times as many calls as 20707. On second thought though, I realized that opioid deaths and overdoses have been a bigger problem in places with more white people, so I suppose it tracks.**
+
+**Q5** Go back to your joined dataframe from Q3 and add two more columns representing the minimum and maximum populations based on the estimate and margin of error, then calculate per capita rates for each. Do you get the same two zip codes for the highest and lowest as you did before? Does that give you more or less confidence in your answers to Q3?
+
+**I *do* get the same two zip codes (unless I calculated totally wrong which knowing me is far from impossible) so I have more confidence in my answer from before.**
+
+```{r}
+joined_moco_zip_pop <- joined_moco_zip_pop |> 
+  mutate(min_people = num_people-moe) |> 
+  mutate(max_people = num_people+moe) |> 
+  mutate(min_per_thousand = min_people/num_calls) |> 
+  mutate(max_per_thousand = max_people/num_calls)
+
+joined_moco_zip_pop |> 
+  arrange(desc(min_per_thousand))
+
+joined_moco_zip_pop |> 
+  arrange(desc(max_per_thousand))
+```
