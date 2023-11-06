@@ -57,9 +57,9 @@ First, we'll add a month column to our dataframe using lubridate.
 ```{r}
 baltco_911_calls_by_month <- baltco_911_calls |> #saving it out to a new dataframe
   mutate(month = month(date, label=TRUE)) |> #making the month column usable, label=TRUE means it'll show "August" instead of "8"
-  group_by(month) |> 
-  summarize(total_calls = n()) |> 
-  arrange(desc(total_calls))
+  group_by(month) |> #preparing the data for later on, in this case by organizing calls by month.
+  summarize(total_calls = n()) |> #gives us the cute chart we're used to
+  arrange(desc(total_calls)) #tells it how to arrange the data
 
 baltco_911_calls_by_month
 ```
@@ -171,7 +171,7 @@ And now we'll apply the economist theme from that package with theme_economist()
 
 ### Task 10: Run the following code
 
-**Task** Run the following code. Explain what you see after running the code in the space below. What has changed from the last version of the chart? **Answer**
+**Task** Run the following code. Explain what you see after running the code in the space below. What has changed from the last version of the chart? **We've made it a little prettier with a blue background.**
 
 ```{r}
 baltco_911_calls_by_month |>
@@ -185,7 +185,7 @@ Those axis titles are kind of a mess. Let's change "count" on the x axis to "tot
 
 ### Task 11: Run the following code
 
-**Task** Run the following code. Explain what you see after running the code in the space below. What has changed from the last codeblock? **Answer**
+**Task** Run the following code. Explain what you see after running the code in the space below. What has changed from the last codeblock? **We've added a title, labels, and a source line.**
 
 ```{r}
 baltco_911_calls_by_month |>
