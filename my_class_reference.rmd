@@ -150,11 +150,11 @@ colnames(your_file_or_variable_name) <- c("what_you_want_it_to_say_instead")
 In this example, the first column's name is changed to "what_you_want_it_to_say_instead"
 
 Easier:
+
 ```{r}
 df <- df |> 
   rename(new_name = old_name)
 ```
-
 
 ### Boolean Operators
 
@@ -275,4 +275,17 @@ If there are two columns that show the same thing but don't have the same name, 
 maryland_population_with_voters_and_demographics <- 
   maryland_population_with_voters |> 
   left_join(maryland_demographics, join_by(COUNTY == NAME))
+```
+
+Get the total of a column of numbers
+
+```{r}
+library(janitor)
+adorn_totals("row")
+
+# from lab 9
+moco_overdoses_22 <- moco_overdoses_22 |> 
+  group_by(zip) |> 
+  summarize(count=n()) |> 
+  adorn_totals("row")
 ```
