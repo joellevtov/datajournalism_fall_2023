@@ -30,9 +30,9 @@ You will need to create columns for the date, week and month based on the existi
 ```{r}
 pg_overdoses_2022 <- read_csv("data/prince_georges_2022_overdoses.csv")
 pg_overdoses_2022 <- pg_overdoses_2022 |> 
-  mutate(date = date(datetime)) |> 
+  as_datetime(date = date(datetime)) |> 
   mutate(week = week(datetime)) |> 
-  mutate(month = month(datetime, label=TRUE)) 
+  mutate(month = month(datetime)) 
   
 ```
 

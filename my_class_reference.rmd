@@ -162,7 +162,7 @@ df <- df |>
 
 -   Is not: !=
 
--   Contains: str_detect("keyword")
+-   Contains: filter(str_detect(column, "keyword"))
 
 -   Is greater than: \>
 
@@ -177,6 +177,10 @@ df <- df |>
 -   Or: \|
 
 -   Begins with: \^
+
+-   Ends with: \$
+
+-   Anything that starts with sa and ends with 0 or more m's: sam\*
 
 If you want to look up two things in one filter
 
@@ -289,3 +293,19 @@ moco_overdoses_22 <- moco_overdoses_22 |>
   summarize(count=n()) |> 
   adorn_totals("row")
 ```
+
+**Mapping**
+
+Relevant libraries:
+
+-   sf - reads shapefiles, the backbone of a map
+
+-   ggplot - makes the map
+
+-   tigris - has state, county, and local borders taken directly from the Census
+
+Maryland FIPS code is 24
+
+geom_sf makes maps
+
+geometry=true on tidycensus lets you make maps
