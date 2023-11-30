@@ -107,7 +107,7 @@ Then load it:
 **Task** Run the following code. Describe the output in the space below. **Er, nothing. It just downloads the package.**
 
 ```{r}
-install.packages('tigris')
+# install.packages('tigris')
 library(tigris)
 ```
 
