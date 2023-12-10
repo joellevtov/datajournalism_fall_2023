@@ -1,5 +1,4 @@
 ---
-u---
 title: "Class Reference"
 author: "Derek Willis"
 output:
@@ -10,6 +9,9 @@ output:
     toc_float:
       collapsed: true
       smooth_scroll: false
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +24,10 @@ print("Hello puppy!")
 
 ## Introduction
 
-Consider this a personal guide to the commands and functions you will learn. In general, when you come across an R command or function that you want to remember, put it in here along with a description of what it does and when you'd use it.
+Consider this a personal guide to the commands and functions you will
+learn. In general, when you come across an R command or function that
+you want to remember, put it in here along with a description of what it
+does and when you'd use it.
 
 ### Find repository
 
@@ -36,7 +41,10 @@ The command to set a working directory is setwd(). For example:
 setwd("~/code/data_journalism_2023_spring")
 ```
 
-Or, open the folder you're working from in the R directory on the right (or click on the three dots to use the Finder app) - that's your working directory - and click the settings wheel and hit "Set as working directory."
+Or, open the folder you're working from in the R directory on the right
+(or click on the three dots to use the Finder app) - that's your working
+directory - and click the settings wheel and hit "Set as working
+directory."
 
 ### First, install and load the tidyverse
 
@@ -47,6 +55,9 @@ library(tidyverse)
 
 ```{r}
 library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(stringr)
 ```
 
 ### How to read in a CSV file from the Internet
@@ -55,7 +66,8 @@ library(tidyverse)
 wes_moore_contributions <- read_csv("https://raw.githubusercontent.com/stephenneukam/CNS_Annapolis/main/Campaign_finance/Moore_ContributionsList.csv")
 ```
 
-You use the `n()` function to count rows and get an overview of the data, like so:
+You use the `n()` function to count rows and get an overview of the
+data, like so:
 
 ```{r}
 umd_courses |> 
@@ -65,7 +77,9 @@ umd_courses |>
 
 Use variables, and how to make new datasets
 
-If you don't want to type in 2 everytime you use it, you can set it equal to "number" - meaning that whenever you type "number" it'll know that you mean 2.
+If you don't want to type in 2 everytime you use it, you can set it
+equal to "number" - meaning that whenever you type "number" it'll know
+that you mean 2.
 
 ```{r}
 number <- 2
@@ -73,7 +87,8 @@ number <- 2
 
 ### Open certain data
 
-Note: The function is stupid and refuses to look into subfolders. So tell it to look in the folder where the file is, not anywhere else.
+Note: The function is stupid and refuses to look into subfolders. So
+tell it to look in the folder where the file is, not anywhere else.
 
 ```{r}
 what_you_want_the_thing_youre_saying_to_be_called' <- read_csv/rds/etc("file_name")
@@ -95,7 +110,8 @@ CMD + P
 
 #### Sorting
 
-Think of a deck of cards, if you're told to group them by group, you'd seperate by hearts, clubs, aces, jacks, etc. **Same thing in R.**
+Think of a deck of cards, if you're told to group them by group, you'd
+seperate by hearts, clubs, aces, jacks, etc. **Same thing in R.**
 
 ```{r}
 group_by()
@@ -123,13 +139,15 @@ Get a quick list of all the columns
 col_names (%)
 ```
 
-Filter data using the filter() function. BUT make sure to do ==, otherwise it'll turn all the columns into, in this case, journalism.
+Filter data using the filter() function. BUT make sure to do ==,
+otherwise it'll turn all the columns into, in this case, journalism.
 
 ```{r}
 filter(department=="Journalism")
 ```
 
-R loves to be a pain in the ass and show you only case-matched results. Here's how to tell it to look for it in every case:
+R loves to be a pain in the ass and show you only case-matched results.
+Here's how to tell it to look for it in every case:
 
 ```{r}
 filter(str_detect(gender, "(?i)F"))
@@ -147,7 +165,8 @@ Change a column's name
 colnames(your_file_or_variable_name) <- c("what_you_want_it_to_say_instead")
 ```
 
-In this example, the first column's name is changed to "what_you_want_it_to_say_instead"
+In this example, the first column's name is changed to
+"what_you_want_it_to_say_instead"
 
 Easier:
 
@@ -155,6 +174,21 @@ Easier:
 df <- df |> 
   rename(new_name = old_name)
 ```
+
+|                           |                                   |
+|---------------------------|-----------------------------------|
+| `mean()`                  | Average of all values in column   |
+| `median()`                | Median value of column            |
+| `sd()`                    | Standard deviation of column      |
+| `var()`                   | Variance of column                |
+| `min()`                   | Minimum value in column           |
+| `max()`                   | Maximum value in column           |
+| `IQR()`                   | Interquartile range of column     |
+| `summarize(n_distinct())` | Number of unique values in column |
+| `sum()`                   | Sum values of column              |
+| `n()`                     | Number of a defined thing         |
+| `summarize(count(n())`    |                                   |
+| `na.rm=TRUE`              | removes NAs                       |
 
 ### Boolean Operators
 
@@ -179,6 +213,17 @@ df <- df |>
 -   Begins with: \^
 
 -   Ends with: \$
+
+-   Remove special character function:\
+
+-   The character column being processed: .x
+
+-   "Escape character," tells the machine to interpret a character like
+    \$ literally:  
+
+(two \\ are used to make super clear to the computer that you )
+
+-   d: digit class of characters
 
 -   Anything that starts with sa and ends with 0 or more m's: sam\*
 
@@ -237,7 +282,10 @@ Remove something from your library/environment
 rm(get_rid_of_this)
 ```
 
-Check if there are any non-dates in a column after you've loaded the lubridate library using the women_shot_in_2020 dataframe with dates in a ymd arrangement (quiet=TRUE just tells R to shut the hell up about its stupid warnings):
+Check if there are any non-dates in a column after you've loaded the
+lubridate library using the women_shot_in_2020 dataframe with dates in a
+ymd arrangement (quiet=TRUE just tells R to shut the hell up about its
+stupid warnings):
 
 ```{r}
 testing_shot_women <- women_shot_in_2020 %>%
@@ -246,7 +294,9 @@ testing_shot_women <- women_shot_in_2020 %>%
 
 **Combining data**
 
-`bind_rows` helps to combine data. It'll combine any two datasets with the same structure together - identical column names and data structured the same way.
+`bind_rows` helps to combine data. It'll combine any two datasets with
+the same structure together - identical column names and data structured
+the same way.
 
 ```{r}
 # bind_rows with list, from pre-lab 6
@@ -254,11 +304,15 @@ county_voters_combined <- bind_rows(list(county_voters_2016, county_voters_2018,
 View(county_voters_combined)
 ```
 
-It gets more complicated when you have two similar, but not identically structured tables (think different column names). We use `join` for these cases. It has several values:
+It gets more complicated when you have two similar, but not identically
+structured tables (think different column names). We use `join` for
+these cases. It has several values:
 
-`left_join` - takes the table on the left and adds only matching data from the right table
+`left_join` - takes the table on the left and adds only matching data
+from the right table
 
-`right_join` - takes the table on the right and adds only matching data from the left table
+`right_join` - takes the table on the right and adds only matching data
+from the left table
 
 `inner_join` - returns only matches
 
@@ -271,9 +325,15 @@ maryland_population |>
   left_join(county_voters_2020, join_by("COUNTY"))
 ```
 
-This would add only data from the rows with the same label as `maryland_population` thanks to the `join_by` function. It tells R what to look at when trying to join two datasets. (By default, R joins by county here, there's nothing else it could join by so it works fine here. Anything else wouldn't work because `maryland_population` doesn't have the same columns.)
+This would add only data from the rows with the same label as
+`maryland_population` thanks to the `join_by` function. It tells R what
+to look at when trying to join two datasets. (By default, R joins by
+county here, there's nothing else it could join by so it works fine
+here. Anything else wouldn't work because `maryland_population` doesn't
+have the same columns.)
 
-If there are two columns that show the same thing but don't have the same name, you can tell R what's equivalent in the `join_by` function.
+If there are two columns that show the same thing but don't have the
+same name, you can tell R what's equivalent in the `join_by` function.
 
 ```{r}
 maryland_population_with_voters_and_demographics <- 
@@ -300,12 +360,159 @@ Relevant libraries:
 
 -   sf - reads shapefiles, the backbone of a map
 
--   ggplot - makes the map
+-   ggplot - makes the map (note that it uses + not the \|\> sign)
 
--   tigris - has state, county, and local borders taken directly from the Census
+    -   geom(smooth) - line of best fit
+
+    -   geom(point) - scatter plot
+
+    -   alpha() - opacity
+
+        -   call something like geom(point), then (alpha=.5)
+
+    -   shape()
+
+    -   color() - does NOT go inside aes()
+
+    -   labs() - labels
+
+        -   x
+
+        -   y
+
+        -   title
+
+        -   subtitle
+
+        -   caption
+
+    -   geom_bar() - bar chart
+
+    -   ggsave("1234.png") - save image
+
+-   tigris - has state, county, and local borders taken directly from
+    the Census
 
 Maryland FIPS code is 24
 
-geom_sf makes maps
+`geom_sf` makes maps
 
-geometry=true on tidycensus lets you make maps
+`geometry=true` on tidycensus lets you make maps
+
+The floor() function rounds a decimal down to the next integer, and the
+ceiling() function will round up to the next integer.
+
+If you have a list of CSVs like: exam_1.csv exam_2.csv exam_3.csv
+exam_4.csv exam_5.csv exam_6.csv
+
+student_files \<- list.files(pattern='exams\_.\*csv') df_list \<-
+lapply(student_files, read_csv) students \<- bind_rows(df_list)
+
+-   The first line uses `list.files()` and a [regular
+    expression](https://www.codecademy.com/courses/practical-data-cleaning/lessons/nlp-regex-conceptual/exercises/introduction),
+    a sequence of characters describing a pattern of text that should be
+    matched, to find any file in the current directory that starts
+    with `'file_'`and has an extension of `csv`, storing the name of
+    each file in a vector `files`
+
+-   The second line uses `lapply()` to read each file in `files` into a
+    data frame with `read_csv()`, storing the [data
+    frames](https://www.codecademy.com/resources/docs/r/data-frames) in `df_list`
+
+-   The third line then concatenates all of those data frames together
+    with dplyr\'s `bind_rows()` function
+
+make a new data frame based on certain values from the old data frame
+
+```{r}
+df |>
+  gather(Column1', 'Column2', key='new_dataframe_name', value='new_column_name'')
+```
+
+```{r}
+duplicated() 
+# shows us which rows are duplicates
+distinct()
+# gets rid of those rows
+duplicated(column, keep.all=TRUE) |> 
+  # will look for duplicates in the column you specify and then keep only the first entry - USE IN CONJUNCTION WITH:
+  table()
+# will give you a count of how many duplicated rows there are like:
+# FALSE  TRUE 
+# 1976    24 
+```
+
+alternative to lubridate is `str_sub` in readr package. (it's worse).
+assuming we have 08292001:
+
+```{r}
+df <- data.frame(
+  birthday=as.Date("08292001", format="%m%d%y")
+)
+# note that normally you can just tell r c(1,2,3,4) but in this case i couldn't because it interpreted 0 as a function not a number and so displayed 8292001. alternatively you could do it like this:
+number <- "$08292001"
+df <- data.frame(
+  birthday = c(number)
+)
+
+df <- df |> 
+  mutate(month= str_sub(birthday,0,1)) |>
+  mutate(day= str_sub(birthday,3,4)) |> 
+  mutate(year= str_sub(birthday, 5))
+df
+```
+
+Backslashes.\
+Oy vey. They seem really complicated but we can break it down.
+Backslashes are "escape characters," meaning they tell R to interpret
+the next thing literally. For example, the \$ has a special signifiance
+in R. But sometimes you just want a damn dollar sign, nothing fancy.
+
+**Enter the backslash. If you type \\\$ R will print the dollar sign and
+no bullshit. Maybe. Probably. Depending on the context.**
+
+**Seperating columns. `str_sub() or seperate()`**
+
+```{r}
+str_sub(new_col_name = str_sub(old_col_name, col_1, col_2))
+
+df |> 
+  seperate(c('new_col_name', 'new_col_name'), 'chr_to_seperate_by')
+
+# e.g.:
+df |> 
+  separate(col_to_split, c('user_type', 'country'), '_')
+```
+
+make sure to spell "separate" right!!
+
+**Figure out what type of data each column is:**
+
+```{r}
+str(df)
+```
+
+**Get rid of a certain thing**
+
+```{r}
+# gsub()
+df |> 
+  mutate(price = gsub('//$', '', price))
+```
+
+**Make something into a number**
+
+```{r}
+df |> 
+  as.numeric(column)
+```
+
+**View the top of a dataset**
+
+`head(your_data)`
+
+`head(your_data, num_of_rows)`
+
+**Remove pesky nas**
+
+`na.rm=TRUE`
